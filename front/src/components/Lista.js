@@ -7,7 +7,7 @@ const List = (props) => {
     return (
         <div>
             <h1>Lista {props.lista.nombreLista}</h1>
-                <ListaToDo className="col"/>
+                <ListaToDo/>
 
         </div>
     );
