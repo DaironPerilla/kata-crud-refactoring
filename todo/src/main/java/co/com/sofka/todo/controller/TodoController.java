@@ -28,6 +28,7 @@ public class TodoController {
 
     @PostMapping(value = "api/todo")
     public ResponseEntity<Todo> save(@RequestBody Todo todo){
+        System.out.println("todo = " + todo);
         return service.save(todo);
     }
 
