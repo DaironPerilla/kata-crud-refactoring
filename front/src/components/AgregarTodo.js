@@ -1,53 +1,49 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const ListaToDo = (props) => {
 
     const HOST_API = "http://localhost:8080/api";
     const [tarea, setTarea] = useState({
         "completed": false,
-        "groudName": props.idLista.name,
+        "groudName": props.group.name,
         "tarea": "",
 
     });
+
+    const [edit, setEdit] = useState({
+        valor: false,
+        id: -1
+    });
+
     const [tareas, setTareas] = useState([]);
 
-    const handleInputChange = (event) => {
+    const cargar = () => {
+        fetch(HOST_API + "/TodoLists", {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then((todo) => {
+                filtro(todo);
+            })
+
+    }
+
+    const handleSubmit = (e) => {
         setTarea({
             ...tarea,
-            [event.target.name]: event.target.value
-        })
-
-    }
-
-
-    // const agregarTodo = (event) => {
-    //     event.preventDefault();
-    //     console.log(tarea[0])
-    //     if (tarea[0] !== undefined) {   
-    //         if (tarea[0].length > 0) {
-    //             setTareas([
-    //                 ...tareas, tarea[0]
-    //             ])
-    //         }
-    //     }
-    // }
-
-    const borrar = (dato) => {
-        const auxList = tareas.filter(tarea => {
-            return tarea !== dato
+            "tarea": e.target.value
         });
-        console.log(auxList.length)
-        setTareas([
-            auxList
-        ])
-
     }
 
-    const agregarTodo = (event) => {
-        event.preventDefault();
-        event.target.value = "";
+    
 
-        console.log(tarea);
+    const agregar = (e) => {
+        e.preventDefault();
+        document.getElementById("todoInput").value = "";
+
 
         fetch(HOST_API + "/TodoList", {
             method: "POST",
@@ -58,75 +54,151 @@ const ListaToDo = (props) => {
         })
             .then(response => response.json())
             .then((todo) => {
-                console.log(todo)
-                mostrarTodo();
+                cargar();
             }).catch(err => console.log(err))
 
     }
 
-    const mostrarTodo = () => {
-        fetch(HOST_API + "/TodoLists", {
-            method: "GET",
+    useEffect(() => {
+        cargar();
+    }, [])
+
+
+    const filtro = (lista) => {
+        let auxList = lista.filter((item, index) => {
+            return item.groudName === props.group.name;
+        });
+
+        setTareas(auxList);
+        
+    }
+
+    const cambioSwitch = (e) => {
+        let text = document.getElementById(e.target.id);
+        text.classList.toggle("text-decoration-line-through");
+        setTarea({
+            ...tarea,
+            "completed": e.target.checked
+        });
+    }
+
+
+    const editar = (e) => {
+        setEdit({
+            valor: true,
+            id: e.target.id
+        })
+    }
+
+    const confirmarEditar = (id) => {
+        let update = tarea;
+        update.id = id;
+        fetch(HOST_API + "/TodoList", {
+            method: "PUT",
+            body: JSON.stringify(update),
             headers: {
                 'Content-Type': 'application/json'
             }
         })
             .then(response => response.json())
             .then((todo) => {
-                console.log(todo);
-                setTareas(todo);
-            })
+                cargar();
+            }).catch(err => console.log(err))
+
+
+        setEdit({
+            valor: false,
+            id: -1
+        })
+    }
+
+
+    const eliminar = (id) => {
+        fetch(HOST_API + "/TodoList/" + id, {
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            cargar();
+            return response.json()})
+
+            .catch(err => console.log(err))
     }
 
     return (
-      <h1>asdasd</h1>
+        <div>
+            <form>
+                <input
+                    type="text"
+                    placeholder="Ingrese una tarea"
+                    name="tarea"
+                    id="todoInput"
+                    onChange={handleSubmit}
+
+                />
+                <button
+                    className="btn btn-success col-auto"
+                    onClick={agregar}
+                >Agregar</button>
+            </form>
+
+            {
+                tareas.map((item, index) => {
+                    return (
+                        <div className="row align-items-end">
+                            <p className="col-1" id={item.id}>{item.tarea} </p>
+                            <div className="col mt-2">
+                                <div class="form-check form-switch col-3">
+                                    <input
+                                        className={"form-check-input "+"switch"+item.id}
+                                        type="checkbox"
+                                        role="switch"
+                                        name="completed"
+                                        onChange={cambioSwitch}
+                                        id={item.id}
+
+                                    />
+                                    <label class="form-check-label" for="flexSwitchCheckChecked">Completado</label>
+                                </div>
+
+                                <button
+                                    className="btn btn-outline-danger col-1 me-md-3"
+                                    onClick={()=>eliminar(item.id)}>Eliminar</button>
+
+                                <button
+                                    className="btn btn-outline-info col-1"
+                                    id={item.id}
+                                    onClick={editar}>Editar</button>
+
+                            </div>
+
+                            {edit.valor && edit.id == item.id ?
+
+                                <div className="row">
+                                    <input type="text"
+                                        className="col form-control"
+                                        placeholder="Ingrese una tarea"
+                                        name="tarea"
+                                        id="todoInput"
+                                        onChange={handleSubmit} />
+                                    <button
+                                        className="btn btn-outline-info col-auto"
+                                        onClick={() => confirmarEditar(edit.id)}>Confirmar</button>
+
+                                </div>
+                                : <span></span>}
+                        </div>
+
+                    );
+                })
+
+            }
+
+        </div>
     );
 
-    // return (
-    //     <div>
 
-    //         <h4>Lista Todo {props.idLista.name}</h4>
-    //         <form>
-    //             <input
-    //                 type="text"
-    //                 placeholder="Ingrese una tarea"
-    //                 name="tarea"
-    //                 onChange={handleInputChange}
-    //             />
-    //             <button className="btn btn-success col-auto" onClick={agregarTodo}>Agregar</button>
-    //         </form>
-
-    //         <div className="row align-items-end">
-    //             {
-    //                 tareas.map((item, index) => {
-    //                     return (
-    //                         <div className="row mt-2">
-    //                             <p key={index} className="col-3">{item.tarea}</p>
-
-    //                             <div class="form-check form-switch col-3">
-    //                                 <input 
-    //                                 class="form-check-input" 
-    //                                 type="checkbox" 
-    //                                 role="switch" 
-    //                                 name="completed"
-    //                                 />
-    //                                 <label class="form-check-label" for="flexSwitchCheckChecked">Completado</label>
-    //                             </div>
-
-    //                             <button key={index}
-    //                                 className="btn btn-outline-danger col-1 me-md-3" onClick={() => borrar(item)}>Eliminar</button>
-
-    //                             <button key={index}
-    //                                 className="btn btn-outline-info col-1">Editar</button>
-
-    //                         </div>
-    //                     )
-    //                 })
-    //             }
-
-    //         </div>
-    //     </div>
-    // );
 }
 
 export default ListaToDo;
