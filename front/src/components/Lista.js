@@ -1,20 +1,29 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import ListaToDo from './AgregarTodo'
 const List = (props) => {
 
     const HOST_API = "http://localhost:8080/api";
 
+    /**
+     * Elimina la lista indicada de la pagina y la 
+     * base de datos con sus tareas incluidas
+     */
     const eliminar = () => {
         fetch(HOST_API + "/todo/" + props.group.id, {
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json'
             }
-        });
+        })
+        .catch(err => console.error(err));
 
         filtrarTodo();
     }
 
+
+    /**
+     * Filtra las tareas de lista actual
+     */
     const filtrarTodo = () => {
         let lista;
         fetch(HOST_API + "/TodoLists", {
@@ -28,8 +37,13 @@ const List = (props) => {
                 lista = todo.filter(to => to.groudName === props.group.name);
                 eliminarTodos(lista);
             })
+            .catch(err => console.error(err))
     }
 
+    /**
+     * Recibe la lista de las tareas de la 
+     * lista actual y las elimina, al finalizar recarga la pagina
+     */
     const eliminarTodos = (lista) => {
         for (let i of lista) {
             fetch(HOST_API + "/TodoList/" + i.id, {
@@ -41,7 +55,7 @@ const List = (props) => {
                 return response.json();
             })
             
-            .catch(err => console.log(err))
+            .catch(err => console.error(err))
         }
         window.location.reload();
     }

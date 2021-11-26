@@ -7,16 +7,22 @@ const Formulario = () => {
     const [datos, setDatos] = useState({
         "name": ""
     });
-    
+
     const [lista, setLista] = useState([]);
-    
-    
+    const [error, setError] = useState(false);
+
+    /**
+     * Carga los datos de la base de datos al 
+     * iniciar la aplicacion
+     */
     useEffect(() => {
-        console.log(lista);
         cargar();
-        console.log(lista);
     }, [])
 
+    /**
+     * Esta pendiente de los cambios en el input y 
+     * los guarda en el estado datos.name
+     */
     const handleInputChange = (evento) => {
         setDatos({
             ...datos,
@@ -24,6 +30,10 @@ const Formulario = () => {
         });
     };
 
+
+    /**
+     * Agrega una nueva lista a la base de datos y a la pagina
+     */
     const Agregar = (e) => {
         e.preventDefault();
         document.getElementById("nombreLista").value = "";
@@ -43,6 +53,10 @@ const Formulario = () => {
             }).catch(err => console.log(err))
     }
 
+
+    /**
+     * Actualiza los datos de la pagina con los de la base de datos
+     */
     const cargar = () => {
         fetch(HOST_API + "/todos", {
             method: "GET",
@@ -53,6 +67,9 @@ const Formulario = () => {
             .then(response => response.json())
             .then((todo) => {
                 setLista(todo);
+            })
+            .catch(err => {
+                setError(true);
             })
 
     }
@@ -78,17 +95,25 @@ const Formulario = () => {
                     </div>
                     <button className="btn btn-primary me-md-3" onClick={Agregar}>CREAR</button>
                 </form>
+                {error &&
+                    <div className="alert alert-danger mt-3" role="alert">
+                        Error al cargar la base de datos
+                    </div>
+                }
             </div>
             {
                 lista.map((item, index) => {
 
-                   return (
-                       <List key={index} group={item}/>
-                       )
-                       
+                    return (
+                        <Fragment>
+                            <List key={index} group={item} />
+
+
+                        </Fragment>
+                    )
+
 
                 })
-
             }
 
 

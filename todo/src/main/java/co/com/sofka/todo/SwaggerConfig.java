@@ -13,6 +13,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Collections;
 
+
+/**
+ * Clase que genera una interfaz para ver y hacer pruebas basicas
+ * con la información de la API, para acceder a esta opción se
+ * hace mediante la ruta donde se ejecuto la API y como endpoint se usa
+ * "swagger-ui.html"
+ * Ejemplo: http://localhost:8080/swagger-ui.html
+ */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
@@ -25,7 +33,7 @@ public class SwaggerConfig {
     }
 
     private ApiInfo getApiInfo() {
-        return new ApiInfo("Api test ProyectoCiclo4", "Back-End TiendasGenericas", "1.0", "",
+        return new ApiInfo("Api test Sofka FullStact", "Back-End CRUD", "1.0", "",
                 new Contact("Nombre", "Direccion URL", "Email"), "", "",
                 Collections.emptyList());
     }

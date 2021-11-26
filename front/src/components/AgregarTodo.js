@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
+
+/*
+Componente para las tareas individuales de cada Lista 
+ */ 
 const ListaToDo = (props) => {
 
     const HOST_API = "http://localhost:8080/api";
@@ -17,6 +21,9 @@ const ListaToDo = (props) => {
 
     const [tareas, setTareas] = useState([]);
 
+
+    /*Carga los datos de la base datos y los renderiza al inicio de 
+    la aplicación o cuando hay cambios*/
     const cargar = () => {
         fetch(HOST_API + "/TodoLists", {
             method: "GET",
@@ -28,9 +35,13 @@ const ListaToDo = (props) => {
             .then((todo) => {
                 filtro(todo);
             })
+            .catch(err => console.error(err));
 
     }
 
+
+    /*Esta pendiente del input y actualiza la 
+    información de entrada de la nueva tarea*/
     const handleSubmit = (e) => {
         setTarea({
             ...tarea,
@@ -39,7 +50,10 @@ const ListaToDo = (props) => {
     }
 
     
-
+    /**
+     * Agrega una nueva tarea en la base de datos 
+     * con el nombre de la lista que la contiene
+     */
     const agregar = (e) => {
         e.preventDefault();
         document.getElementById("todoInput").value = "";
@@ -55,15 +69,22 @@ const ListaToDo = (props) => {
             .then(response => response.json())
             .then((todo) => {
                 cargar();
-            }).catch(err => console.log(err))
+            }).catch(err => console.error(err))
 
     }
 
+    /**
+     * Carga por primera vez la funcion cargar() al 
+     * iniciar la aplicación y esta pendeintes de los cambios
+     */
     useEffect(() => {
         cargar();
     }, [])
 
 
+    /**
+     * Filtra las tareas de esta lista
+     */
     const filtro = (lista) => {
         let auxList = lista.filter((item, index) => {
             return item.groudName === props.group.name;
@@ -73,6 +94,9 @@ const ListaToDo = (props) => {
         
     }
 
+    /**
+     * Controla el switch de las tareas completadas
+     */
     const cambioSwitch = (e) => {
         let text = document.getElementById(e.target.id);
         text.classList.toggle("text-decoration-line-through");
@@ -83,6 +107,9 @@ const ListaToDo = (props) => {
     }
 
 
+    /**
+     * Activa la opcion de editar una tarea
+     */
     const editar = (e) => {
         setEdit({
             valor: true,
@@ -90,6 +117,10 @@ const ListaToDo = (props) => {
         })
     }
 
+    /**
+     * Confirma la edición de la tarea y la 
+     * actualiza en la base de datos
+     */
     const confirmarEditar = (id) => {
         let update = tarea;
         update.id = id;
@@ -103,7 +134,7 @@ const ListaToDo = (props) => {
             .then(response => response.json())
             .then((todo) => {
                 cargar();
-            }).catch(err => console.log(err))
+            }).catch(err => console.error(err))
 
 
         setEdit({
@@ -112,7 +143,9 @@ const ListaToDo = (props) => {
         })
     }
 
-
+    /**
+     * Elimina la tarea indicada de la pagina y la base de datos
+     */
     const eliminar = (id) => {
         fetch(HOST_API + "/TodoList/" + id, {
             method: "DELETE",
@@ -123,7 +156,7 @@ const ListaToDo = (props) => {
             cargar();
             return response.json()})
 
-            .catch(err => console.log(err))
+            .catch(err => console.error(err));
     }
 
     return (
@@ -151,7 +184,7 @@ const ListaToDo = (props) => {
                             <div className="col mt-2">
                                 <div class="form-check form-switch col-3">
                                     <input
-                                        className={"form-check-input "+"switch"+item.id}
+                                        className={"form-check-input switch"+item.id}
                                         type="checkbox"
                                         role="switch"
                                         name="completed"
@@ -163,11 +196,11 @@ const ListaToDo = (props) => {
                                 </div>
 
                                 <button
-                                    className="btn btn-outline-danger col-1 me-md-3"
+                                    className="btn btn-outline-danger col-auto me-md-3"
                                     onClick={()=>eliminar(item.id)}>Eliminar</button>
 
                                 <button
-                                    className="btn btn-outline-info col-1"
+                                    className="btn btn-outline-info col-auto"
                                     id={item.id}
                                     onClick={editar}>Editar</button>
 
@@ -181,7 +214,8 @@ const ListaToDo = (props) => {
                                         placeholder="Ingrese una tarea"
                                         name="tarea"
                                         id="todoInput"
-                                        onChange={handleSubmit} />
+                                        onChange={handleSubmit} 
+                                        />
                                     <button
                                         className="btn btn-outline-info col-auto"
                                         onClick={() => confirmarEditar(edit.id)}>Confirmar</button>
