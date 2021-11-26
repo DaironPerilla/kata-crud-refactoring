@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController @CrossOrigin(origins = "*")
+@RestController
+@CrossOrigin(origins = "*")
 public class TodoController {
 
     @Autowired
@@ -22,20 +23,20 @@ public class TodoController {
     }
 
     @GetMapping(value = "api/todo/{id}")
-    public ResponseEntity<Todo> getById(@PathVariable("id") Long id){
+    public ResponseEntity<Todo> getById(@PathVariable("id") Long id) {
         return service.getById(id);
     }
 
     @PostMapping(value = "api/todo")
-    public ResponseEntity<Todo> save(@RequestBody Todo todo){
+    public ResponseEntity<Todo> save(@RequestBody Todo todo) {
         System.out.println("todo = " + todo);
         return service.save(todo);
     }
 
     @PutMapping(value = "api/todo")
-    public ResponseEntity<Todo> update(@RequestBody Todo todo){
+    public ResponseEntity<Todo> update(@RequestBody Todo todo) {
         ResponseEntity<Todo> auxTodo = service.getById(todo.getId());
-        if(auxTodo.getStatusCodeValue() == 200){
+        if (auxTodo.getStatusCodeValue() == 200) {
             return service.save(todo);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -43,11 +44,9 @@ public class TodoController {
     }
 
     @DeleteMapping(value = "api/todo/{id}")
-    public void deleteById(@PathVariable("id") Long id){
+    public void deleteById(@PathVariable("id") Long id) {
         service.deleteById(id);
     }
-
-
 
 
 }

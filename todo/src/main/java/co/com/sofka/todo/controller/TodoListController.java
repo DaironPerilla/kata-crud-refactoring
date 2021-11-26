@@ -49,6 +49,8 @@ public class TodoListController {
         service.deleteById(id);
     }
 
-
-
+    @GetMapping(value = "api/TodoList/nombre/{nombre}")
+    public ResponseEntity<List<TodoList>> getByName(@PathVariable("name") String name){
+        return service.getByGroupName(name);
+    }
 }

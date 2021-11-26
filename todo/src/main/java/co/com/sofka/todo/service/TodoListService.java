@@ -54,4 +54,16 @@ public class TodoListService {
         }
     }
 
+    public ResponseEntity<List<TodoList>> getByGroupName(String name){
+        try {
+            List<TodoList> todo = repository.findByGroudName(name);
+            if (todo.size() > 0){
+                return new ResponseEntity<List<TodoList>>(todo, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

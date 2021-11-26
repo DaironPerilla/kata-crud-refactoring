@@ -1,8 +1,7 @@
 package co.com.sofka.todo.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Todo {
@@ -11,7 +10,6 @@ public class Todo {
     @GeneratedValue
     private Long id;
     private String name;
-    private String groupListId;
 
     public Long getId() {
         return id;
@@ -29,11 +27,4 @@ public class Todo {
         this.name = name;
     }
 
-    public String getGroupListId() {
-        return groupListId;
-    }
-
-    public void setGroupListId(String groupListId) {
-        this.groupListId = groupListId;
-    }
 }
